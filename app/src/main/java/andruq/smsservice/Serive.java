@@ -20,7 +20,13 @@ public class Serive extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        new Reader();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                new Reader();
+            }
+        }).run();
+
         return Service.START_NOT_STICKY;
     }
 

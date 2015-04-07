@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Created by Andru on 06/04/2015.
  */
-public class Reader extends BroadcastReceiver {
+public class Reader extends BroadcastReceiver{
 
     private SharedPreferences preferences;
 
@@ -48,21 +48,40 @@ public class Reader extends BroadcastReceiver {
                     for(int i=0; i<msgs.length; i++){
                         msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]);
                         msg_from = msgs[i].getOriginatingAddress();
-                        String msgBody = msgs[i].getMessageBody();
+                        String msgBody = msgs[i].getMessageBody().trim().toLowerCase();
                         String sender = msgs[i].getOriginatingAddress();
+
+                        if(msgBody.toLowerCase().startsWith("buy"))
+                        {
+                            buy(msgBody,msg_from);
+                        }
+
+                        else if(msgBody.toLowerCase().startsWith("transfer"))
+                        {
+                            transfer(msgBody,msg_from);
+                        }
+
+                        else if(msgBody.toLowerCase().startsWith("register"))
+                        {
+                            register(msgBody,msg_from);
+                        }
+                        else
+                        {
+                            Log.e("SMS info", "no action was taken");
+                        }
+
+
                         Log.e("Message", msgBody);
                         Log.e("Sender", sender);
                         Toast.makeText(context,msgBody,Toast.LENGTH_LONG);
 
-                        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-                        pairs.add(new BasicNameValuePair("sender", sender));
-                        pairs.add(new BasicNameValuePair("message", msgBody));
 
-                        getSingleLineResponse(pairs,"http://home.andruquinn.com/fyp/sms.php");
+
 
                     }
                 }catch(Exception e){
-//                            Log.d("Exception caught",e.getMessage());
+                    e.printStackTrace();
+                            Log.e("Exception caught",e.toString());
                 }
             }
         }
@@ -98,4 +117,31 @@ public class Reader extends BroadcastReceiver {
         return null;
     }
 
+
+    public void transfer(String message,String sender)
+    {
+        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+        pairs.add(new BasicNameValuePair("sender", sender));
+        pairs.add(new BasicNameValuePair("message", message));
+
+        Log.e("return",getSingleLineResponse(pairs,"http://home.andruquinn.com/fyp/transfer.php"));
+    }
+
+    public void buy(String message, String sender)
+    {
+        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+        pairs.add(new BasicNameValuePair("sender", sender));
+        pairs.add(new BasicNameValuePair("message", message));
+
+        Log.e("return",getSingleLineResponse(pairs,"http://home.andruquinn.com/fyp/buy.php"));
+    }
+
+    public void register(String message, String sender)
+    {
+        List<NameValuePair> pairs = new ArrayList<NameValuePair>();
+        pairs.add(new BasicNameValuePair("sender", sender));
+        pairs.add(new BasicNameValuePair("message", message));
+
+        Log.e("return",getSingleLineResponse(pairs,"http://home.andruquinn.com/fyp/register.php"));
+    }
 }

@@ -3,6 +3,7 @@ package andruq.smsservice;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,7 +18,16 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        startService(new Intent(this, Serive.class));
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+
+        StrictMode.setThreadPolicy(policy);
+        new Thread(new Runnable() {
+    @Override
+    public void run() {
+        startService(new Intent(getApplicationContext(), Serive.class));
+    }
+}).run();
+
 
         /*
 
